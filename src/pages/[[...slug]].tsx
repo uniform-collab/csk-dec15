@@ -37,8 +37,17 @@ export const getStaticPaths = async () => {
     state: process.env.NODE_ENV === 'development' ? CANVAS_DRAFT_STATE : CANVAS_PUBLISHED_STATE,
   });
 
+  const locales = ['en-us', 'da-dk'];
+
+  const filteredPaths =
+    nodes?.reduce((acc: string[], { path, type }) => (type === 'composition' ? [...acc, path] : acc), []) || [];
+  let localizedPaths: string[] = [];
+  locales.forEach((locale: string) => {
+    localizedPaths = localizedPaths.concat(filteredPaths.map(p => p.replace(':locale', locale)));
+  });
+
   return {
-    paths: nodes?.reduce((acc: string[], { path, type }) => (type === 'composition' ? [...acc, path] : acc), []) || [],
-    fallback: 'blocking',
+    paths: localizedPaths,
+    fallback: false,
   };
 };
